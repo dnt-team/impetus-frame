@@ -17,7 +17,7 @@
 
 //! Test mock for unit tests and benchmarking
 
-use fp_evm::Precompile;
+use fp_evm::{IsPrecompileResult, Precompile};
 use frame_support::{
 	parameter_types,
 	traits::{ConstU32, FindAuthor},
@@ -88,15 +88,19 @@ parameter_types! {
 	pub const ExistentialDeposit: u64 = 0;
 }
 impl pallet_balances::Config for Test {
+	type RuntimeEvent = RuntimeEvent;
+	type WeightInfo = ();
 	type Balance = u64;
 	type DustRemoval = ();
-	type RuntimeEvent = RuntimeEvent;
 	type ExistentialDeposit = ExistentialDeposit;
 	type AccountStore = System;
-	type WeightInfo = ();
+	type ReserveIdentifier = ();
+	type HoldIdentifier = ();
+	type FreezeIdentifier = ();
 	type MaxLocks = ();
 	type MaxReserves = ();
-	type ReserveIdentifier = ();
+	type MaxHolds = ();
+	type MaxFreezes = ();
 }
 
 parameter_types! {
@@ -175,7 +179,10 @@ impl PrecompileSet for MockPrecompileSet {
 	/// Check if the given address is a precompile. Should only be called to
 	/// perform the check while not executing the precompile afterward, since
 	/// `execute` already performs a check internally.
-	fn is_precompile(&self, address: H160) -> bool {
-		address == H160::from_low_u64_be(1)
+	fn is_precompile(&self, address: H160, _gas: u64) -> IsPrecompileResult {
+		IsPrecompileResult::Answer {
+			is_precompile: address == H160::from_low_u64_be(1),
+			extra_cost: 0,
+		}
 	}
 }
