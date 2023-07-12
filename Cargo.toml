@@ -5,6 +5,7 @@ members = [
 	"frontier/primitives/*",
 	"frontier/template/node",
 	"frontier/template/runtime",
+	"moonbeam/precompiles/*",
 ]
 resolver = "2"
 
@@ -144,3 +145,16 @@ ark-bw6-761 = { version = "0.4.0", default-features = false }
 ark-ec = { version = "0.4.0", default-features = false }
 ark-ff = { version = "0.4.0", default-features = false }
 ark-std = { version = "0.4.0", default-features = false }
+
+# Moonbeam
+affix = "0.1.2"
+derive_more = "0.99"
+impl-trait-for-tuples = "0.2.1"
+num_enum = { version = "0.5.3", default-features = false }
+parity-scale-codec = { version = "3.2.2", default-features = false, features = [
+	"derive",
+] }
+paste = "1.0.6"
+sha3 = { version = "0.10", default-features = false }
+similar-asserts = "1.1.0"
+xcm = { git = "https://github.com/paritytech/polkadot", branch = "release-v0.9.43", default-features = false }
