@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
 // This file is part of Frontier.
 //
-// Copyright (c) 2015-2022 Parity Technologies (UK) Ltd.
+// Copyright (c) 2023 Parity Technologies (UK) Ltd.
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,22 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-//! tx pool rpc interface
+#![deny(unused_crate_dependencies)]
 
-use ethereum_types::U256;
-use jsonrpsee::{core::RpcResult, proc_macros::rpc};
+pub mod backend;
 
-use crate::types::*;
-
-/// TxPool rpc interface
-#[rpc(server)]
-pub trait TxPoolApi {
-	#[method(name = "txpool_content")]
-	fn content(&self) -> RpcResult<TxPoolResult<TransactionMap<TxPoolTransaction>>>;
-
-	#[method(name = "txpool_inspect")]
-	fn inspect(&self) -> RpcResult<TxPoolResult<TransactionMap<Summary>>>;
-
-	#[method(name = "txpool_status")]
-	fn status(&self) -> RpcResult<TxPoolResult<U256>>;
-}
+pub use self::backend::*;
