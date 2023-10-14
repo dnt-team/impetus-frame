@@ -1,11 +1,13 @@
 [workspace]
 members = [
-	"frontier/frame/*",
-	"frontier/client/*",
-	"frontier/primitives/*",
-	"frontier/template/node",
-	"frontier/template/runtime",
-	"moonbeam/precompiles/*",
+	"frame/*",
+	"client/*",
+	"primitives/*",
+	"precompiles",
+	"precompiles/macro",
+	"precompiles/tests-external",
+	"template/node",
+	"template/runtime",
 ]
 resolver = "2"
 
@@ -18,6 +20,7 @@ repository = "https://github.com/paritytech/frontier/"
 async-trait = "0.1"
 bn = { package = "substrate-bn", version = "0.6", default-features = false }
 clap = { version = "4.4.3", features = ["derive", "deprecated"] }
+derive_more = "0.99"
 environmental = { version = "1.1.4", default-features = false }
 ethereum = { version = "0.14.0", default-features = false }
 ethereum-types = { version = "0.14.1", default-features = false }
@@ -27,10 +30,12 @@ hash-db = { version = "0.16.0", default-features = false }
 hex = { version = "0.4.3", default-features = false, features = ["alloc"] }
 hex-literal = "0.4.1"
 impl-serde = { version = "0.4.0", default-features = false }
+impl-trait-for-tuples = "0.2.1"
 jsonrpsee = "0.16.3"
 kvdb-rocksdb = "0.19.0"
 libsecp256k1 = { version = "0.7.1", default-features = false }
 log = { version = "0.4.20", default-features = false }
+num_enum = { version = "0.7.0", default-features = false }
 parity-db = "0.4.10"
 parking_lot = "0.12.1"
 rlp = { version = "0.5.2", default-features = false }
@@ -38,9 +43,11 @@ scale-codec = { package = "parity-scale-codec", version = "3.6.4", default-featu
 scale-info = { version = "2.9.0", default-features = false, features = ["derive"] }
 serde = { version = "1.0", default-features = false, features = ["derive", "alloc"] }
 serde_json = "1.0"
+similar-asserts = "1.1.0"
 sqlx = { version = "0.7.1", default-features = false, features = ["macros"] }
 thiserror = "1.0"
 tokio = "1.32.0"
+
 # Substrate Client
 sc-basic-authorship = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
 sc-block-builder = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
@@ -57,6 +64,7 @@ sc-keystore = { version = "4.0.0-dev", git = "https://github.com/paritytech/polk
 sc-network = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
 sc-network-common = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
 sc-network-sync = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
+sc-offchain = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
 sc-rpc = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
 sc-rpc-api = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
 sc-service = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
@@ -71,22 +79,23 @@ sp-blockchain = { version = "4.0.0-dev", git = "https://github.com/paritytech/po
 sp-consensus = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
 sp-consensus-aura = { version = "0.10.0-dev", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
 sp-consensus-grandpa = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
-sp-core = { version = "7.0.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-core = { version = "21.0.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-core-hashing = { version = "9.0.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-core-hashing-proc-macro = { version = "9.0.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
 sp-database = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
 sp-inherents = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
-sp-io = { version = "7.0.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
-sp-keyring = { version = "7.0.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
+sp-io = { version = "23.0.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-keyring = { version = "24.0.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
 sp-offchain = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
-sp-runtime = { version = "7.0.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
-sp-runtime-interface = { version = "7.0.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-runtime = { version = "24.0.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-runtime-interface = { version = "17.0.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
 sp-session = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
-sp-state-machine = { version = "0.13.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
-sp-std = { version = "5.0.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
-sp-storage = { version = "7.0.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-state-machine = { version = "0.28.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-std = { version = "8.0.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-storage = { version = "13.0.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
 sp-timestamp = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
 sp-transaction-pool = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
-sp-trie = { version = "7.0.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
-sp-version = { version = "5.0.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
+sp-version = { version = "22.0.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
 # Substrate FRAME
 frame-benchmarking = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
 frame-executive = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
@@ -110,36 +119,41 @@ substrate-build-script-utils = { version = "3.0.0", git = "https://github.com/pa
 substrate-frame-rpc-system = { version = "4.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
 substrate-test-runtime-client = { version = "2.0.0", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
 substrate-wasm-builder = { version = "5.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
+
 # Frontier Client
-fc-cli = { version = "1.0.0-dev", path = "frontier/client/cli" }
-fc-consensus = { version = "2.0.0-dev", path = "frontier/client/consensus" }
-fc-db = { version = "2.0.0-dev", path = "frontier/client/db" }
-fc-mapping-sync = { version = "2.0.0-dev", path = "frontier/client/mapping-sync" }
-fc-rpc = { version = "2.0.0-dev", path = "frontier/client/rpc" }
-fc-rpc-core = { version = "1.1.0-dev", path = "frontier/client/rpc-core" }
-fc-storage = { version = "1.0.0-dev", path = "frontier/client/storage" }
+fc-api = { version = "1.0.0-dev", path = "client/api" }
+fc-cli = { version = "1.0.0-dev", path = "client/cli", default-features = false }
+fc-consensus = { version = "2.0.0-dev", path = "client/consensus" }
+fc-db = { version = "2.0.0-dev", path = "client/db", default-features = false }
+fc-mapping-sync = { version = "2.0.0-dev", path = "client/mapping-sync", default-features = false }
+fc-rpc = { version = "2.0.0-dev", path = "client/rpc", default-features = false }
+fc-rpc-core = { version = "1.1.0-dev", path = "client/rpc-core" }
+fc-storage = { version = "1.0.0-dev", path = "client/storage" }
 # Frontier Primitive
-fp-account = { version = "1.0.0-dev", path = "frontier/primitives/account", default-features = false }
-fp-consensus = { version = "2.0.0-dev", path = "frontier/primitives/consensus", default-features = false }
-fp-dynamic-fee = { version = "1.0.0", path = "frontier/primitives/dynamic-fee", default-features = false }
-fp-ethereum = { version = "1.0.0-dev", path = "frontier/primitives/ethereum", default-features = false }
-fp-evm = { version = "3.0.0-dev", path = "frontier/primitives/evm", default-features = false }
-fp-rpc = { version = "3.0.0-dev", path = "frontier/primitives/rpc", default-features = false }
-fp-self-contained = { version = "1.0.0-dev", path = "frontier/primitives/self-contained", default-features = false }
-fp-storage = { version = "2.0.0", path = "frontier/primitives/storage", default-features = false }
+fp-account = { version = "1.0.0-dev", path = "primitives/account", default-features = false }
+fp-consensus = { version = "2.0.0-dev", path = "primitives/consensus", default-features = false }
+fp-dynamic-fee = { version = "1.0.0", path = "primitives/dynamic-fee", default-features = false }
+fp-ethereum = { version = "1.0.0-dev", path = "primitives/ethereum", default-features = false }
+fp-evm = { version = "3.0.0-dev", path = "primitives/evm", default-features = false }
+fp-rpc = { version = "3.0.0-dev", path = "primitives/rpc", default-features = false }
+fp-self-contained = { version = "1.0.0-dev", path = "primitives/self-contained", default-features = false }
+fp-storage = { version = "2.0.0", path = "primitives/storage", default-features = false }
 # Frontier FRAME
-pallet-base-fee = { version = "1.0.0", path = "frontier/frame/base-fee", default-features = false }
-pallet-dynamic-fee = { version = "4.0.0-dev", path = "frontier/frame/dynamic-fee", default-features = false }
-pallet-ethereum = { version = "4.0.0-dev", path = "frontier/frame/ethereum", default-features = false }
-pallet-evm = { version = "6.0.0-dev", path = "frontier/frame/evm", default-features = false }
-pallet-evm-chain-id = { version = "1.0.0-dev", path = "frontier/frame/evm-chain-id", default-features = false }
-pallet-evm-precompile-modexp = { version = "2.0.0-dev", path = "frontier/frame/evm/precompile/modexp", default-features = false }
-pallet-evm-precompile-sha3fips = { version = "2.0.0-dev", path = "frontier/frame/evm/precompile/sha3fips", default-features = false }
-pallet-evm-precompile-simple = { version = "2.0.0-dev", path = "frontier/frame/evm/precompile/simple", default-features = false }
-pallet-evm-test-vector-support = { version = "1.0.0-dev", path = "frontier/frame/evm/test-vector-support" }
-pallet-hotfix-sufficients = { version = "1.0.0", path = "frontier/frame/hotfix-sufficients", default-features = false }
+pallet-base-fee = { version = "1.0.0", path = "frame/base-fee", default-features = false }
+pallet-dynamic-fee = { version = "4.0.0-dev", path = "frame/dynamic-fee", default-features = false }
+pallet-ethereum = { version = "4.0.0-dev", path = "frame/ethereum", default-features = false }
+pallet-evm = { version = "6.0.0-dev", path = "frame/evm", default-features = false }
+pallet-evm-chain-id = { version = "1.0.0-dev", path = "frame/evm-chain-id", default-features = false }
+pallet-evm-precompile-modexp = { version = "2.0.0-dev", path = "frame/evm/precompile/modexp", default-features = false }
+pallet-evm-precompile-sha3fips = { version = "2.0.0-dev", path = "frame/evm/precompile/sha3fips", default-features = false }
+pallet-evm-precompile-simple = { version = "2.0.0-dev", path = "frame/evm/precompile/simple", default-features = false }
+pallet-evm-test-vector-support = { version = "1.0.0-dev", path = "frame/evm/test-vector-support" }
+pallet-hotfix-sufficients = { version = "1.0.0", path = "frame/hotfix-sufficients", default-features = false }
 # Frontier Template
-frontier-template-runtime = { path = "frontier/template/runtime", default-features = false }
+frontier-template-runtime = { path = "template/runtime", default-features = false }
+# Frontier Utility
+precompile-utils = { path = "precompiles", default-features = false }
+
 # Arkworks
 ark-bls12-377 = { version = "0.4.0", default-features = false, features = ["curve"] }
 ark-bw6-761 = { version = "0.4.0", default-features = false }
@@ -147,15 +161,16 @@ ark-ec = { version = "0.4.0", default-features = false }
 ark-ff = { version = "0.4.0", default-features = false }
 ark-std = { version = "0.4.0", default-features = false }
 
-# Moonbeam
-affix = "0.1.2"
-derive_more = "0.99"
-impl-trait-for-tuples = "0.2.1"
-num_enum = { version = "0.7.0", default-features = false }
-parity-scale-codec = { version = "3.2.2", default-features = false, features = [
-	"derive",
-] }
-paste = "1.0.6"
-sha3 = { version = "0.10", default-features = false }
-similar-asserts = "1.1.0"
-xcm = { git = "https://github.com/paritytech/polkadot", branch = "release-v0.9.43", default-features = false }
+[profile.release]
+# Substrate runtime requires unwinding.
+panic = "unwind"
+
+[profile.production]
+inherits = "release"
+
+# Sacrifice compile speed for execution speed by using optimization flags:
+
+# https://doc.rust-lang.org/rustc/linker-plugin-lto.html
+lto = "fat"
+# https://doc.rust-lang.org/rustc/codegen-options/index.html#codegen-units
+codegen-units = 1
