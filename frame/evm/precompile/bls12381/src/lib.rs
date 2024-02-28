@@ -18,8 +18,8 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 // Arkworks
-use ark_bls12_377::{
-	g1::Config as G1Config, g2::Config as G2Config, Bls12_377, Fq, Fq2, Fr, G1Affine, G1Projective,
+use ark_bls12_381::{
+	g1::Config as G1Config, g2::Config as G2Config, Bls12_381, Fq, Fq2, Fr, G1Affine, G1Projective,
 	G2Affine, G2Projective,
 };
 use ark_ec::{
@@ -36,8 +36,8 @@ use fp_evm::{
 	PrecompileResult,
 };
 
-/// Gas discount table for BLS12-377 G1 and G2 multi exponentiation operations.
-const BLS12377_MULTIEXP_DISCOUNT_TABLE: [u16; 128] = [
+/// Gas discount table for BLS12-381 G1 and G2 multi exponentiation operations.
+const BLS12381_MULTIEXP_DISCOUNT_TABLE: [u16; 128] = [
 	1200, 888, 764, 641, 594, 547, 500, 453, 438, 423, 408, 394, 379, 364, 349, 334, 330, 326, 322,
 	318, 314, 310, 306, 302, 298, 294, 289, 285, 281, 277, 273, 269, 268, 266, 265, 263, 262, 260,
 	259, 257, 256, 254, 253, 251, 250, 248, 247, 245, 244, 242, 241, 239, 238, 236, 235, 233, 232,
@@ -217,20 +217,20 @@ fn decode_g2(input: &[u8], offset: usize) -> Result<G2Projective, PrecompileFail
 	}
 }
 
-/// Bls12377G1Add implements EIP-2539 G1Add precompile.
-pub struct Bls12377G1Add;
+/// Bls12381 implements EIP-2537 G1Add precompile.
+pub struct Bls12381G1Add;
 
-impl Bls12377G1Add {
-	/// https://eips.ethereum.org/EIPS/eip-2539#g1-addition
+impl Bls12381G1Add {
+	/// https://eips.ethereum.org/EIPS/eip-2537#g1-addition
 	const GAS_COST: u64 = 600;
 }
 
-impl Precompile for Bls12377G1Add {
-	/// Implements EIP-2539 G1Add precompile.
+impl Precompile for Bls12381G1Add {
+	/// Implements EIP-2537 G1Add precompile.
 	/// > G1 addition call expects `256` bytes as an input that is interpreted as byte concatenation of two G1 points (`128` bytes each).
 	/// > Output is an encoding of addition operation result - single G1 point (`128` bytes).
 	fn execute(handle: &mut impl PrecompileHandle) -> PrecompileResult {
-		handle.record_cost(Bls12377G1Add::GAS_COST)?;
+		handle.record_cost(Bls12381G1Add::GAS_COST)?;
 
 		let input = handle.input();
 		if input.len() != 256 {
@@ -255,20 +255,20 @@ impl Precompile for Bls12377G1Add {
 	}
 }
 
-/// Bls12377G1Mul implements EIP-2539 G1Mul precompile.
-pub struct Bls12377G1Mul;
+/// Bls12381G1Mul implements EIP-2537 G1Mul precompile.
+pub struct Bls12381G1Mul;
 
-impl Bls12377G1Mul {
-	/// https://eips.ethereum.org/EIPS/eip-2539#g1-multiplication
+impl Bls12381G1Mul {
+	/// https://eips.ethereum.org/EIPS/eip-2537#g1-multiplication
 	const GAS_COST: u64 = 12_000;
 }
 
-impl Precompile for Bls12377G1Mul {
-	/// Implements EIP-2539 G1Mul precompile.
+impl Precompile for Bls12381G1Mul {
+	/// Implements EIP-2537 G1Mul precompile.
 	/// > G1 multiplication call expects `160` bytes as an input that is interpreted as byte concatenation of encoding of G1 point (`128` bytes) and encoding of a scalar value (`32` bytes).
 	/// > Output is an encoding of multiplication operation result - single G1 point (`128` bytes).
 	fn execute(handle: &mut impl PrecompileHandle) -> PrecompileResult {
-		handle.record_cost(Bls12377G1Mul::GAS_COST)?;
+		handle.record_cost(Bls12381G1Mul::GAS_COST)?;
 
 		let input = handle.input();
 		if input.len() != 160 {
@@ -293,10 +293,10 @@ impl Precompile for Bls12377G1Mul {
 	}
 }
 
-/// Bls12377G1MultiExp implements EIP-2539 G1MultiExp precompile.
-pub struct Bls12377G1MultiExp;
+/// Bls12381G1MultiExp implements EIP-2537 G1MultiExp precompile.
+pub struct Bls12381G1MultiExp;
 
-impl Bls12377G1MultiExp {
+impl Bls12381G1MultiExp {
 	const MULTIPLIER: u64 = 1_000;
 
 	/// Returns the gas required to execute the pre-compiled contract.
@@ -307,23 +307,23 @@ impl Bls12377G1MultiExp {
 			return 0;
 		}
 		// Lookup discount value for G1 point, scalar value pair length
-		let d_len = BLS12377_MULTIEXP_DISCOUNT_TABLE.len();
+		let d_len = BLS12381_MULTIEXP_DISCOUNT_TABLE.len();
 		let discount = if k <= d_len {
-			BLS12377_MULTIEXP_DISCOUNT_TABLE[k - 1]
+			BLS12381_MULTIEXP_DISCOUNT_TABLE[k - 1]
 		} else {
-			BLS12377_MULTIEXP_DISCOUNT_TABLE[d_len - 1]
+			BLS12381_MULTIEXP_DISCOUNT_TABLE[d_len - 1]
 		};
 		// Calculate gas and return the result
-		k as u64 * Bls12377G1Mul::GAS_COST * discount as u64 / Bls12377G1MultiExp::MULTIPLIER
+		k as u64 * Bls12381G1Mul::GAS_COST * discount as u64 / Bls12381G1MultiExp::MULTIPLIER
 	}
 }
 
-impl Precompile for Bls12377G1MultiExp {
-	/// Implements EIP-2539 G1MultiExp precompile.
+impl Precompile for Bls12381G1MultiExp {
+	/// Implements EIP-2537 G1MultiExp precompile.
 	/// G1 multiplication call expects `160*k` bytes as an input that is interpreted as byte concatenation of `k` slices each of them being a byte concatenation of encoding of G1 point (`128` bytes) and encoding of a scalar value (`32` bytes).
 	/// Output is an encoding of multiexponentiation operation result - single G1 point (`128` bytes).
 	fn execute(handle: &mut impl PrecompileHandle) -> PrecompileResult {
-		let gas_cost = Bls12377G1MultiExp::calculate_gas_cost(handle.input().len());
+		let gas_cost = Bls12381G1MultiExp::calculate_gas_cost(handle.input().len());
 		handle.record_cost(gas_cost)?;
 
 		let k = handle.input().len() / 160;
@@ -364,20 +364,20 @@ impl Precompile for Bls12377G1MultiExp {
 	}
 }
 
-/// Bls12377G2Add implements EIP-2539 G2Add precompile.
-pub struct Bls12377G2Add;
+/// Bls12381G2Add implements EIP-2537 G2Add precompile.
+pub struct Bls12381G2Add;
 
-impl Bls12377G2Add {
-	/// https://eips.ethereum.org/EIPS/eip-2539#g2-addition
-	const GAS_COST: u64 = 4_500;
+impl Bls12381G2Add {
+	/// https://eips.ethereum.org/EIPS/eip-2537#g2-addition
+	const GAS_COST: u64 = 4500;
 }
 
-impl Precompile for Bls12377G2Add {
-	/// Implements EIP-2539 G2Add precompile.
+impl Precompile for Bls12381G2Add {
+	/// Implements EIP-2537 G2Add precompile.
 	/// > G2 addition call expects `512` bytes as an input that is interpreted as byte concatenation of two G2 points (`256` bytes each).
 	/// > Output is an encoding of addition operation result - single G2 point (`256` bytes).
 	fn execute(handle: &mut impl PrecompileHandle) -> PrecompileResult {
-		handle.record_cost(Bls12377G2Add::GAS_COST)?;
+		handle.record_cost(Bls12381G2Add::GAS_COST)?;
 
 		let input = handle.input();
 		if input.len() != 512 {
@@ -402,20 +402,20 @@ impl Precompile for Bls12377G2Add {
 	}
 }
 
-/// Bls12377G2Mul implements EIP-2539 G2Mul precompile.
-pub struct Bls12377G2Mul;
+/// Bls12381G2Mul implements EIP-2537 G2Mul precompile.
+pub struct Bls12381G2Mul;
 
-impl Bls12377G2Mul {
-	// https://eips.ethereum.org/EIPS/eip-2539#g2-multiplication
+impl Bls12381G2Mul {
+	// https://eips.ethereum.org/EIPS/eip-2537#g2-multiplication
 	const GAS_COST: u64 = 55_000;
 }
 
-impl Precompile for Bls12377G2Mul {
-	/// Implements EIP-2539 G2MUL precompile logic.
+impl Precompile for Bls12381G2Mul {
+	/// Implements EIP-2537 G2MUL precompile logic.
 	/// > G2 multiplication call expects `288` bytes as an input that is interpreted as byte concatenation of encoding of G2 point (`256` bytes) and encoding of a scalar value (`32` bytes).
 	/// > Output is an encoding of multiplication operation result - single G2 point (`256` bytes).
 	fn execute(handle: &mut impl PrecompileHandle) -> PrecompileResult {
-		handle.record_cost(Bls12377G2Mul::GAS_COST)?;
+		handle.record_cost(Bls12381G2Mul::GAS_COST)?;
 
 		let input = handle.input();
 		if input.len() != 288 {
@@ -440,10 +440,10 @@ impl Precompile for Bls12377G2Mul {
 	}
 }
 
-// Bls12377G2MultiExp implements EIP-2539 G2MultiExp precompile.
-pub struct Bls12377G2MultiExp;
+// Bls12381G2MultiExp implements EIP-2537 G2MultiExp precompile.
+pub struct Bls12381G2MultiExp;
 
-impl Bls12377G2MultiExp {
+impl Bls12381G2MultiExp {
 	const MULTIPLIER: u64 = 1_000;
 
 	/// Returns the gas required to execute the pre-compiled contract.
@@ -454,23 +454,23 @@ impl Bls12377G2MultiExp {
 			return 0;
 		}
 		// Lookup discount value for G2 point, scalar value pair length
-		let d_len = BLS12377_MULTIEXP_DISCOUNT_TABLE.len();
+		let d_len = BLS12381_MULTIEXP_DISCOUNT_TABLE.len();
 		let discount = if k <= d_len {
-			BLS12377_MULTIEXP_DISCOUNT_TABLE[k - 1]
+			BLS12381_MULTIEXP_DISCOUNT_TABLE[k - 1]
 		} else {
-			BLS12377_MULTIEXP_DISCOUNT_TABLE[d_len - 1]
+			BLS12381_MULTIEXP_DISCOUNT_TABLE[d_len - 1]
 		};
 		// Calculate gas and return the result
-		k as u64 * Bls12377G2Mul::GAS_COST * discount as u64 / Bls12377G2MultiExp::MULTIPLIER
+		k as u64 * Bls12381G2Mul::GAS_COST * discount as u64 / Bls12381G2MultiExp::MULTIPLIER
 	}
 }
 
-impl Precompile for Bls12377G2MultiExp {
-	/// Implements EIP-2539 G2MultiExp precompile logic
+impl Precompile for Bls12381G2MultiExp {
+	/// Implements EIP-2537 G2MultiExp precompile logic
 	/// > G2 multiplication call expects `288*k` bytes as an input that is interpreted as byte concatenation of `k` slices each of them being a byte concatenation of encoding of G2 point (`256` bytes) and encoding of a scalar value (`32` bytes).
 	/// > Output is an encoding of multiexponentiation operation result - single G2 point (`256` bytes).
 	fn execute(handle: &mut impl PrecompileHandle) -> PrecompileResult {
-		let gas_cost = Bls12377G2MultiExp::calculate_gas_cost(handle.input().len());
+		let gas_cost = Bls12381G2MultiExp::calculate_gas_cost(handle.input().len());
 		handle.record_cost(gas_cost)?;
 
 		let k = handle.input().len() / 288;
@@ -511,17 +511,17 @@ impl Precompile for Bls12377G2MultiExp {
 	}
 }
 
-/// Bls12377Pairing implements EIP-2539 Pairing precompile.
-pub struct Bls12377Pairing;
+/// Bls12381Pairing implements EIP-2537 Pairing precompile.
+pub struct Bls12381Pairing;
 
-impl Bls12377Pairing {
-	/// https://eips.ethereum.org/EIPS/eip-2539#pairing-operation
-	const BASE_GAS: u64 = 65_000;
-	const PER_PAIR_GAS: u64 = 55_000;
+impl Bls12381Pairing {
+	/// https://eips.ethereum.org/EIPS/eip-2537#pairing-operation
+	const BASE_GAS: u64 = 115000;
+	const PER_PAIR_GAS: u64 = 23000;
 }
 
-impl Precompile for Bls12377Pairing {
-	/// Implements EIP-2539 Pairing precompile logic.
+impl Precompile for Bls12381Pairing {
+	/// Implements EIP-2537 Pairing precompile logic.
 	/// > Pairing call expects `384*k` bytes as an inputs that is interpreted as byte concatenation of `k` slices. Each slice has the following structure:
 	/// > - `128` bytes of G1 point encoding
 	/// > - `256` bytes of G2 point encoding
@@ -535,7 +535,7 @@ impl Precompile for Bls12377Pairing {
 		}
 
 		let k = handle.input().len() / 384;
-		let gas_cost: u64 = Bls12377Pairing::BASE_GAS + (k as u64 * Bls12377Pairing::PER_PAIR_GAS);
+		let gas_cost: u64 = Bls12381Pairing::BASE_GAS + (k as u64 * Bls12381Pairing::PER_PAIR_GAS);
 
 		handle.record_cost(gas_cost)?;
 
@@ -570,7 +570,7 @@ impl Precompile for Bls12377Pairing {
 
 		let mut output = [0u8; 32];
 		// Compute pairing and set the output
-		if Bls12_377::multi_pairing(a, b).is_zero() {
+		if Bls12_381::multi_pairing(a, b).is_zero() {
 			output[31] = 1;
 		}
 
@@ -581,19 +581,19 @@ impl Precompile for Bls12377Pairing {
 	}
 }
 
-/// Bls12377MapG1 implements EIP-2539 MapG1 precompile.
-pub struct Bls12377MapG1;
+/// Bls12381MapG1 implements EIP-2537 MapG1 precompile.
+pub struct Bls12381MapG1;
 
-impl Bls12377MapG1 {
+impl Bls12381MapG1 {
 	const GAS_COST: u64 = 5_500;
 }
 
-impl Precompile for Bls12377MapG1 {
-	/// Implements EIP-2539 Map_To_G1 precompile.
+impl Precompile for Bls12381MapG1 {
+	/// Implements EIP-2537 Map_To_G1 precompile.
 	/// > Field-to-curve call expects `64` bytes an an input that is interpreted as a an element of the base field.
 	/// > Output of this call is `128` bytes and is G1 point following respective encoding rules.
 	fn execute(handle: &mut impl PrecompileHandle) -> PrecompileResult {
-		handle.record_cost(Bls12377MapG1::GAS_COST)?;
+		handle.record_cost(Bls12381MapG1::GAS_COST)?;
 
 		let input = handle.input();
 		if input.len() != 64 {
@@ -620,19 +620,19 @@ impl Precompile for Bls12377MapG1 {
 	}
 }
 
-/// Bls12377MapG2 implements EIP-2539 MapG2 precompile.
-pub struct Bls12377MapG2;
+/// Bls12381MapG2 implements EIP-2537 MapG2 precompile.
+pub struct Bls12381MapG2;
 
-impl Bls12377MapG2 {
-	const GAS_COST: u64 = 75_000;
+impl Bls12381MapG2 {
+	const GAS_COST: u64 = 110000;
 }
 
-impl Precompile for Bls12377MapG2 {
-	/// Implements EIP-2539 Map_FP2_TO_G2 precompile logic.
+impl Precompile for Bls12381MapG2 {
+	/// Implements EIP-2537 Map_FP2_TO_G2 precompile logic.
 	/// > Field-to-curve call expects `128` bytes an an input that is interpreted as a an element of the quadratic extension field.
 	/// > Output of this call is `256` bytes and is G2 point following respective encoding rules.
 	fn execute(handle: &mut impl PrecompileHandle) -> PrecompileResult {
-		handle.record_cost(Bls12377MapG2::GAS_COST)?;
+		handle.record_cost(Bls12381MapG2::GAS_COST)?;
 
 		let input = handle.input();
 		if input.len() != 128 {

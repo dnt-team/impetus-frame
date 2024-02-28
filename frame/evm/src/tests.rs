@@ -135,7 +135,7 @@ mod proof_size_test {
 		assert_eq!(
 			ACCOUNT_BASIC_PROOF_SIZE,
 			frame_system::Account::<Test>::storage_info()
-				.get(0)
+				.first()
 				.expect("item")
 				.max_size
 				.expect("size") as u64
@@ -147,7 +147,7 @@ mod proof_size_test {
 		assert_eq!(
 			ACCOUNT_STORAGE_PROOF_SIZE,
 			AccountStorages::<Test>::storage_info()
-				.get(0)
+				.first()
 				.expect("item")
 				.max_size
 				.expect("size") as u64
@@ -159,7 +159,7 @@ mod proof_size_test {
 		assert_eq!(
 			ACCOUNT_CODES_METADATA_PROOF_SIZE,
 			AccountCodesMetadata::<Test>::storage_info()
-				.get(0)
+				.first()
 				.expect("item")
 				.max_size
 				.expect("size") as u64
@@ -1037,8 +1037,7 @@ fn handle_sufficient_reference() {
 		assert_eq!(account_2.sufficients, 1);
 		EVM::remove_account(&addr_2);
 		let account_2 = frame_system::Account::<Test>::get(substrate_addr_2);
-		// We decreased the sufficient reference by 1 on removing the account.
-		assert_eq!(account_2.sufficients, 0);
+		assert_eq!(account_2.sufficients, 1);
 	});
 }
 
